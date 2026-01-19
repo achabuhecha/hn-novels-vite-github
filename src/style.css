@@ -1,0 +1,210 @@
+/* ========== 极简风格全局样式 ========== */
+
+/* 重置 */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+/* 颜色变量 */
+:root {
+  --color-primary: #1e3a8a;      /* 深蓝 - 头部 */
+  --color-link: #2563eb;          /* 蓝色 - 链接 */
+  --color-text: #1f2937;          /* 深灰 - 正文 */
+  --color-muted: #6b7280;         /* 灰色 - 辅助文字 */
+  --color-bg: #ffffff;            /* 白色 - 背景 */
+  --color-section: #f3f4f6;       /* 浅灰 - 板块背景 */
+  --color-border: #e5e7eb;        /* 边框 */
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  -webkit-font-smoothing: antialiased;
+}
+
+a {
+  color: var(--color-link);
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
+/* 主内容区域（为固定头部/底部留空间） */
+#app {
+  padding-top: 44px;
+  padding-bottom: 50px;
+}
+
+/* ========== 头部 ========== */
+.app-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 44px;
+  background: var(--color-primary);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: bold;
+  z-index: 100;
+}
+
+/* ========== 底部导航 ========== */
+.app-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 50px;
+  background: var(--color-bg);
+  border-top: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  justify-content: space-around;
+  z-index: 100;
+}
+
+.app-footer a {
+  color: var(--color-muted);
+  font-size: 14px;
+  padding: 8px 16px;
+}
+
+.app-footer a.router-link-active,
+.app-footer a:hover {
+  color: var(--color-link);
+}
+
+/* ========== 板块标题 ========== */
+.section-header {
+  background: var(--color-section);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: bold;
+  color: var(--color-text);
+}
+
+.section-header a {
+  font-weight: normal;
+  font-size: 12px;
+}
+
+/* ========== 书籍列表（纯文本行） ========== */
+.book-list {
+  list-style: none;
+}
+
+.book-item {
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.book-item:last-child {
+  border-bottom: none;
+}
+
+.book-category {
+  color: var(--color-muted);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.book-title {
+  color: var(--color-link);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.book-author {
+  color: var(--color-muted);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* ========== 搜索栏 ========== */
+.search-bar {
+  display: flex;
+  padding: 10px 12px;
+  gap: 8px;
+  background: var(--color-section);
+}
+
+.search-bar input {
+  flex: 1;
+  padding: 8px 12px;
+  border: 1px solid var(--color-border);
+  border-radius: 4px;
+  font-size: 14px;
+  outline: none;
+}
+
+.search-bar input:focus {
+  border-color: var(--color-link);
+}
+
+.search-bar button {
+  padding: 8px 16px;
+  background: var(--color-primary);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+/* ========== 加载状态 ========== */
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-muted);
+}
+
+/* ========== 空状态 ========== */
+.empty {
+  text-align: center;
+  padding: 40px;
+  color: var(--color-muted);
+}
+
+/* ========== 分页 ========== */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  padding: 16px;
+}
+
+.pagination a,
+.pagination span {
+  padding: 6px 12px;
+  border: 1px solid var(--color-border);
+  font-size: 12px;
+}
+
+.pagination a:hover {
+  background: var(--color-section);
+  text-decoration: none;
+}
+
+.pagination .active {
+  background: var(--color-link);
+  color: white;
+  border-color: var(--color-link);
+}
