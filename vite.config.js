@@ -18,12 +18,18 @@ function getCurrentTime() {
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [vue()],
+  base: '/',
+  build: {
+    outDir: 'dist',
+    assetsDir: 'assets'
+  },
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src')
     }
   },
   server: {
+    historyApiFallback: true,
     proxy: {
       '/api': {
         target: 'http://5257100.xyz:3000',
