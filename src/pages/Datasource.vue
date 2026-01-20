@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted, onUnmounted, provide, computed } from 'vue'
+import { ref, reactive, onMounted, onUnmounted, provide, computed, nextTick } from 'vue'
 import api from '@/api'
 import CrawlerConfig from '@/components/CrawlerConfig.vue'
 import PagePreview from '@/components/PagePreview.vue'
