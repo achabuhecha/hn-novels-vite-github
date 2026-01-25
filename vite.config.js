@@ -32,7 +32,8 @@ export default defineConfig({
     historyApiFallback: true,
     proxy: {
       '/api': {
-        target: 'https://novelapi.5257100.xyz:2096',
+        // target: 'https://novelapi.5257100.xyz:2096',
+        target: 'http://localhost:3000',
         changeOrigin: true,
         configure: (proxy, options) => {
           // 输出实际请求地址
