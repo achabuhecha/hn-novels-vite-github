@@ -30,10 +30,10 @@ const defaultConfig = {
   outputMode: 'local',
   outputDir: 'novels',
   database: {
-    host: 'mysql6.sqlpub.com',
-    port: 3311,
-    user: 'hn_novel_super',
-    password: 'WlcT9rQbgcdluQAU',
+    host: '5257100.xyz',
+    port: 3306,
+    user: 'root',
+    password: 'Mass@test2022',
     dbName: 'hn_novels'
   },
   listSelector: '',
@@ -73,10 +73,10 @@ const defaultConfig = {
     }
   },
   database: {
-    host: 'mysql6.sqlpub.com',
-    port: 3311,
-    user: 'hn_novel_super',
-    password: 'WlcT9rQbgcdluQAU',
+    host: '5257100.xyz',
+    port: 3306,
+    user: 'root',
+    password: 'Mass@test2022',
     dbName: 'hn_novels'
   },
   multiThread: true,

@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, watch, onMounted } from 'vue'
+import { ref, reactive, computed, watch, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import api from '@/api'
 
@@ -7,7 +7,6 @@ const route = useRoute()
 const router = useRouter()
 
 const activeCategory = ref(0)
-const activeStatus = ref('all')
 const loading = ref(true)
 const novels = ref([])
 const total = ref(0)
@@ -15,14 +14,46 @@ const currentPage = ref(1)
 const pageSize = ref(20)
 const categories = ref([])
 
+// 筛选条件
+const filters = reactive({
+  status: 'all',
+  wordCount: 'all',
+  updateTime: 'all',
+  chapterCount: 'all'
+})
+
 const allCategories = computed(() => {
   return [{ id: 0, name: '全部' }, ...categories.value]
 })
 
-const statuses = [
+// 筛选选项
+const statusOptions = [
   { value: 'all', label: '全部' },
   { value: 'serializing', label: '连载' },
   { value: 'completed', label: '完结' }
+]
+
+const wordCountOptions = [
+  { value: 'all', label: '全部' },
+  { value: '0-30', label: '30万以下', min: 0, max: 300000 },
+  { value: '30-50', label: '30-50万', min: 300000, max: 500000 },
+  { value: '50-100', label: '50-100万', min: 500000, max: 1000000 },
+  { value: '100+', label: '100万以上', min: 1000000, max: null }
+]
+
+const updateTimeOptions = [
+  { value: 'all', label: '全部' },
+  { value: '7days', label: '7天内' },
+  { value: '30days', label: '30天内' },
+  { value: '90days', label: '90天内' }
+]
+
+const chapterCountOptions = [
+  { value: 'all', label: '全部' },
+  { value: '0-100', label: '100章以下', min: 0, max: 100 },
+  { value: '100-500', label: '100-500章', min: 100, max: 500 },
+  { value: '500-1000', label: '500-1000章', min: 500, max: 1000 },
+  { value: '1000+', label: '1000章以上', min: 1000, max: null }
 ]
 
 const fetchCategories = async () => {
@@ -34,16 +65,38 @@ const fetchCategories = async () => {
   }
 }
 
+const getFilterParams = () => {
+  const params = {
+    page: currentPage.value,
+    pageSize: pageSize.value
+  }
+  
+  if (filters.status !== 'all') params.status = filters.status
+  if (filters.updateTime !== 'all') params.updateTime = filters.updateTime
+  
+  // 字数范围
+  const wordOpt = wordCountOptions.find(o => o.value === filters.wordCount)
+  if (wordOpt && wordOpt.min !== undefined) {
+    params.wordCountMin = wordOpt.min
+    if (wordOpt.max) params.wordCountMax = wordOpt.max
+  }
+  
+  // 章节数范围
+  const chapterOpt = chapterCountOptions.find(o => o.value === filters.chapterCount)
+  if (chapterOpt && chapterOpt.min !== undefined) {
+    params.chapterCountMin = chapterOpt.min
+    if (chapterOpt.max) params.chapterCountMax = chapterOpt.max
+  }
+  
+  return params
+}
+
 const fetchBooks = async () => {
   loading.value = true
   try {
     const categoryId = activeCategory.value === 0 ? 'all' : activeCategory.value
     const res = await api.get(`/books/category/${categoryId}`, {
-      params: {
-        page: currentPage.value,
-        pageSize: pageSize.value,
-        status: activeStatus.value
-      }
+      params: getFilterParams()
     })
     novels.value = res.books || []
     total.value = res.total || 0
@@ -61,24 +114,33 @@ const handleCategoryChange = (id) => {
   fetchBooks()
 }
 
-const handleStatusChange = (status) => {
-  activeStatus.value = status
+const handleFilterChange = (key, value) => {
+  filters[key] = value
   currentPage.value = 1
   fetchBooks()
 }
 
 const handlePageChange = (page) => {
   currentPage.value = page
+  router.push({
+    path: route.path,
+    query: { ...route.query, page: page > 1 ? page : undefined }
+  })
   fetchBooks()
   window.scrollTo({ top: 0 })
 }
 
 const totalPages = computed(() => Math.ceil(total.value / pageSize.value))
 
-watch(() => route.params.id, (newId) => {
-  activeCategory.value = newId === 'all' ? 0 : Number(newId) || 0
-  fetchBooks()
-}, { immediate: true })
+watch(
+  () => ({ id: route.params.id, page: route.query.page }),
+  ({ id: newId, page }) => {
+    activeCategory.value = newId === 'all' ? 0 : Number(newId) || 0
+    currentPage.value = Number(page) || 1
+    fetchBooks()
+  },
+  { immediate: true }
+)
 
 onMounted(() => {
   fetchCategories()
@@ -101,15 +163,49 @@ onMounted(() => {
       >{{ cat.name }}</a>
     </div>
     
-    <!-- 状态筛选 -->
-    <div style="padding: 0 12px 10px; display: flex; gap: 12px; border-bottom: 1px solid #e5e7eb;">
+    <!-- 筛选条件 -->
+    <div class="filter-row">
+      <span class="filter-label">状态：</span>
       <a 
-        v-for="status in statuses" 
-        :key="status.value"
+        v-for="opt in statusOptions" 
+        :key="opt.value"
         href="#"
-        @click.prevent="handleStatusChange(status.value)"
-        :style="{ fontWeight: activeStatus === status.value ? 'bold' : 'normal' }"
-      >{{ status.label }}</a>
+        @click.prevent="handleFilterChange('status', opt.value)"
+        :class="{ active: filters.status === opt.value }"
+      >{{ opt.label }}</a>
+    </div>
+    
+    <div class="filter-row">
+      <span class="filter-label">字数：</span>
+      <a 
+        v-for="opt in wordCountOptions" 
+        :key="opt.value"
+        href="#"
+        @click.prevent="handleFilterChange('wordCount', opt.value)"
+        :class="{ active: filters.wordCount === opt.value }"
+      >{{ opt.label }}</a>
+    </div>
+    
+    <div class="filter-row">
+      <span class="filter-label">更新：</span>
+      <a 
+        v-for="opt in updateTimeOptions" 
+        :key="opt.value"
+        href="#"
+        @click.prevent="handleFilterChange('updateTime', opt.value)"
+        :class="{ active: filters.updateTime === opt.value }"
+      >{{ opt.label }}</a>
+    </div>
+    
+    <div class="filter-row" style="border-bottom: 1px solid #e5e7eb;">
+      <span class="filter-label">章节：</span>
+      <a 
+        v-for="opt in chapterCountOptions" 
+        :key="opt.value"
+        href="#"
+        @click.prevent="handleFilterChange('chapterCount', opt.value)"
+        :class="{ active: filters.chapterCount === opt.value }"
+      >{{ opt.label }}</a>
     </div>
 
     <!-- 结果统计 -->
@@ -140,3 +236,26 @@ onMounted(() => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.filter-row {
+  padding: 8px 12px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+}
+.filter-label {
+  color: #6b7280;
+  font-size: 12px;
+  min-width: 40px;
+}
+.filter-row a {
+  font-size: 13px;
+  color: #374151;
+}
+.filter-row a.active {
+  font-weight: bold;
+  color: #2563eb;
+}
+</style>
